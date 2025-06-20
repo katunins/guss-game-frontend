@@ -1,6 +1,6 @@
-import {ERoundStatus, type TRound} from "../src/types";
+import {ERoundStatus, type TRound} from "../types.ts";
 import {useCallback, useEffect, useState} from "react";
-import {calculateRoundStatus} from "../src/helpers";
+import {calculateRoundStatus} from "../helpers.ts";
 import dayjs from "dayjs";
 
 export const useRoundStatus = (round?: TRound) => {

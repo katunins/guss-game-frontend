@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { ERoundStatus, type TRound, type TTap } from "../types.ts";
 import { ApiService } from "../services/api.service.ts";
 import { convertDiffToString, convertRoundDate } from "../helpers.ts";
-import { useRoundStatus } from "../../hooks/useRoundStatus.ts";
+import { useRoundStatus } from "../hooks/useRoundStatus.ts";
 import { Guss } from "../components/Guss.tsx";
 import { io } from 'socket.io-client';
 import { AuthService } from "../services/auth.service.ts";
@@ -57,12 +57,10 @@ export const Round = () => {
                             : [{ id: payload.id, count: payload.count, user: { username: AuthService.user?.username } }]
                     }
                 })
-                // setPoints(payload.count)
             }
         });
 
         socketRef.current.on('disconnect', () => {
-            // navigate('/')
             console.log('Socket.io disconnected');
         });
 

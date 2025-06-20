@@ -1,54 +1,79 @@
-# React + TypeScript + Vite
+# 🎮 Игра Guss
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Добро пожаловать в игру **Guss** — многопользовательское приложение, где вы можете соревноваться в скорости кликов в реальном времени! Сервер и клиент общаются через WebSocket (Socket.io), а все игровые события происходят мгновенно.
 
-Currently, two official plugins are available:
+###Репозиторий фронтенд [https://github.com/katunins/guss-game-frontend](https://github.com/katunins/guss-game-frontend)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+###Репозиторий бэкенд [https://github.com/katunins/guss-game-backend](https://github.com/katunins/guss-game-backend)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Быстрый старт
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 1. 📦 Запуск базы данных
+В бэкенд проекте /guss-game-backend выполните:
+```bash
+docker-compose up -d
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+### 2. 🛠️ Запуск backend сервера
+```bash
+npm i # (возможно потребуется флаг --legacy-peer-deps)
+npm run start:dev
 ```
+> ⚙️ Порт бэкенда задаётся через переменные окружения (см. package.json -> scripts)
+
+### 3. 💻 Запуск frontend
+В новом терминале:
+```bash
+npm i
+npm run dev
+```
+
+---
+
+## 👥 Тестирование игры (2 игрока)
+
+### 4. Откройте [http://localhost:3000](http://localhost:3000) в первом браузере
+
+### 5. Вход под админом
+- **Логин:** `Никита`
+- **Пароль:** любой
+
+### 6. Создайте раунд
+- Нажмите "Добавить раунд"
+- Откроется страница раунда, начнётся отсчёт до старта
+- **Скопируйте ссылку** на раунд
+
+### 7. Откройте второй браузер (или режим инкогнито)
+
+### 8. Вход под игроком 2
+- **Логин:** `player 2`
+- **Пароль:** `12345`
+
+### 9. Перейдите по ссылке раунда
+- Вставьте скопированную ссылку во втором браузере
+
+### 10. Кликайте до конца раунда!
+- Побеждает тот, кто накликает больше всех 👑
+
+---
+
+## ⏱️ Настройка таймеров
+- Тайминги раунда настраиваются в `.env` в папке `backend`
+- После изменения `.env` **перезапустите backend**
+
+---
+
+## 🔗 Технологии
+- **Frontend:** React, Socket.io-client
+- **Backend:** NestJS, Socket.io
+- **База данных:** (см. docker-compose)
+
+---
+
+> ⚡ Соединение сервер-клиент во время игры осуществляется по WebSocket (Socket.io)
+
+---
+
+Удачной игры! Если возникнут вопросы — смотрите комментарии в коде или обратитесь к разработчику. 

@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import dayjs from 'dayjs';
 import {ROUND_STATUS_COLOR_CLASS, ROUND_STATUS_NAME, TIME_FORMAT} from "../const.ts";
 import {type TRound} from "../types.ts";
-import {useRoundStatus} from "../../hooks/useRoundStatus.ts";
+import {useRoundStatus} from "../hooks/useRoundStatus.ts";
 
 export const RoundItem: FC<TRound> = (round) => {
 
