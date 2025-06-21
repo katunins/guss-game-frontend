@@ -42,6 +42,10 @@ export class ApiService {
         return ApiService._fetch(`taps/${uuid}`)
     }
 
+    static async createTap(uuid: string): Promise<void> {
+        return ApiService._fetch(`taps/${uuid}`, {method: 'POST'})
+    }
+
     static async createRound(): Promise<TRound | undefined> {
         return ApiService._fetch('rounds', {method: 'POST'})
     }

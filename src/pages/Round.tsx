@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useCallback, useEffect, useState, useRef, useMemo } from "react";
+import React, { useCallback, useEffect, useState, useRef, useMemo, type FC, type PropsWithChildren } from "react";
 import { ERoundStatus, type TRound, type TTap } from "../types.ts";
 import { ApiService } from "../services/api.service.ts";
 import { convertDiffToString, convertRoundDate } from "../helpers.ts";
@@ -11,10 +11,18 @@ import { AuthService } from "../services/auth.service.ts";
 export const Round = () => {
     const { uuid } = useParams<{ uuid: string }>();
     const [round, setRound] = useState<TRound | undefined>()
-
+    const [isInitialazed, setIsInitialazed] = useState(false)
+    const [isConnected, setIsConnected] = useState(false)
 
     const { status, toStart, toFinish } = useRoundStatus(round)
     const socketRef = useRef<any>(null);
+
+    useEffect(() => {
+        if (!uuid) {
+            return
+        }
+        ApiService.createTap(uuid).then(() => setIsInitialazed(true))
+    }, [uuid])
 
     useEffect(() => {
         if (!uuid) {
@@ -38,6 +46,7 @@ export const Round = () => {
         });
         socketRef.current.on('connect', () => {
             console.log('Socket.io connected');
+            setIsConnected(true)
         });
 
         socketRef.current.on('update', (payload?: TTap) => {
@@ -62,6 +71,7 @@ export const Round = () => {
 
         socketRef.current.on('disconnect', () => {
             console.log('Socket.io disconnected');
+            setIsConnected(false)
         });
 
         return () => {
@@ -87,43 +97,59 @@ export const Round = () => {
     }, [round])
 
     const total = useMemo(() => {
-        return round?.taps?.reduce((total, tap)=>total + tap.count, 0)
-
+        return round?.taps?.reduce((total, tap) => total + tap.count, 0)
     }, [round])
 
-    if (!round) {
+    const content = useMemo(() => {
+        switch (status) {
+            case ERoundStatus.coolDown:
+                return (
+                    <>
+                        <div className="mb-5">
+                            <Guss onClick={handleClick} status={status} />
+                        </div>
+                        <p>Cooldown</p>
+                        <p>до начала раунда {convertDiffToString(toStart)}</p>
+                    </>
+                )
+            case ERoundStatus.active:
+                return (
+                    <>
+                        <div className="mb-5"><Guss onClick={handleClick} status={status} /></div>
+                        <p>Раунд активен!</p>
+                        <p>до конца раунда орсталось {convertDiffToString(toFinish)}</p>
+                        <p>Мои очки - {myCount}</p>
+                    </>
+                )
+            case ERoundStatus.finished:
+                return (
+                    <>
+                        <div className="mb-5">
+                            <Guss onClick={handleClick} status={status} />
+                        </div>
+                        <p>Всего {total}</p>
+                        <p>Победитель - {winnerTap?.user?.username} {winnerTap?.count}</p>
+                        <p>Мои очки - {myCount}</p>
+                    </>
+                )
+        }
+    }, [status, handleClick, toStart, toFinish])
+
+    if (!round || !isInitialazed) {
         return (
             <p>Loading ...</p>
         )
     }
 
+    return (
+        <div className="container h-full">
+            <p className="text-right">
+                Server <span className={isConnected ? "text-green-700" : "text-red-700"}>{isConnected ? "connected" : "disconnected"}</span>
+            </p>
+            <div className="h-full flex flex-col justify-center items-center gap-3">
+                {content}
+            </div>
+        </div>
+    )
 
-    switch (status) {
-        case ERoundStatus.coolDown:
-            return (
-                <>
-                    <Guss onClick={handleClick} status={status} />
-                    <p>Cooldown</p>
-                    <p>до начала раунда {convertDiffToString(toStart)}</p>
-                </>
-            )
-        case ERoundStatus.active:
-            return (
-                <>
-                    <Guss onClick={handleClick} status={status} />
-                    <p>Раунд активен!</p>
-                    <p>до конца раунда орсталось {convertDiffToString(toFinish)}</p>
-                    <p>Мои очки - {myCount}</p>
-                </>
-            )
-        case ERoundStatus.finished:
-            return (
-                <>
-                    <Guss onClick={handleClick} status={status} />
-                    <p>Всего {total}</p>
-                    <p>Победитель - {winnerTap?.user?.username} {winnerTap?.count}</p>
-                    <p>Мои очки - {myCount}</p>
-                </>
-            )
-    }
 }

@@ -10,7 +10,7 @@ export const RoundsList = () => {
     const [rounds, setRounds] = useState<TRound[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate()
-
+    
     useEffect(() => {
         setIsLoading(true)
         ApiService.getRounds().then(rounds => {
