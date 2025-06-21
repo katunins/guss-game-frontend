@@ -5,17 +5,23 @@ import { ApiService } from "../services/api.service.ts";
 import { convertDiffToString, convertRoundDate } from "../helpers.ts";
 import { useRoundStatus } from "../hooks/useRoundStatus.ts";
 import { Guss } from "../components/Guss.tsx";
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { AuthService } from "../services/auth.service.ts";
+
+enum EConnect {
+    unknown = 'unknown',
+    connected = 'connected',
+    disconnected = 'disconnected'
+}
 
 export const Round = () => {
     const { uuid } = useParams<{ uuid: string }>();
     const [round, setRound] = useState<TRound | undefined>()
     const [isInitialazed, setIsInitialazed] = useState(false)
-    const [isConnected, setIsConnected] = useState(false)
+    const [connectStatus, setConnectStatus] = useState(EConnect.unknown)
 
     const { status, toStart, toFinish } = useRoundStatus(round)
-    const socketRef = useRef<any>(null);
+    const socketRef = useRef<Socket>(null);
 
     useEffect(() => {
         if (!uuid) {
@@ -46,7 +52,7 @@ export const Round = () => {
         });
         socketRef.current.on('connect', () => {
             console.log('Socket.io connected');
-            setIsConnected(true)
+            setConnectStatus(EConnect.connected)
         });
 
         socketRef.current.on('update', (payload?: TTap) => {
@@ -71,14 +77,20 @@ export const Round = () => {
 
         socketRef.current.on('disconnect', () => {
             console.log('Socket.io disconnected');
-            setIsConnected(false)
+            setConnectStatus(EConnect.disconnected)
         });
 
         return () => {
-            socketRef.current.disconnect();
+            socketRef.current?.disconnect();
             socketRef.current = null;
         };
     }, [uuid, status, socketRef]);
+
+    useEffect(() => {
+        if (socketRef.current && connectStatus === EConnect.disconnected) {
+            socketRef.current.connect()
+        }
+    }, [socketRef, connectStatus])
 
     const handleClick = useCallback(() => {
         if (socketRef.current && uuid) {
@@ -144,7 +156,7 @@ export const Round = () => {
     return (
         <div className="container h-full">
             <p className="text-right">
-                Server <span className={isConnected ? "text-green-700" : "text-red-700"}>{isConnected ? "connected" : "disconnected"}</span>
+                Server <span className={connectStatus ? "text-green-700" : "text-red-700"}>{connectStatus ? "connected" : "disconnected"}</span>
             </p>
             <div className="h-full flex flex-col justify-center items-center gap-3">
                 {content}
