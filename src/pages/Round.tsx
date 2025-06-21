@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import React, { useCallback, useEffect, useState, useRef, useMemo, type FC, type PropsWithChildren } from "react";
+import { useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { ERoundStatus, type TRound, type TTap } from "../types.ts";
 import { ApiService } from "../services/api.service.ts";
 import { convertDiffToString, convertRoundDate } from "../helpers.ts";
@@ -50,9 +50,15 @@ export const Round = () => {
                 'Authorization': `Bearer ${AuthService.token}`
             }
         });
+
         socketRef.current.on('connect', () => {
             console.log('Socket.io connected');
             setConnectStatus(EConnect.connected)
+        });
+
+        socketRef.current.on('disconnect', () => {
+            console.log('Socket.io disconnected');
+            setConnectStatus(EConnect.disconnected)
         });
 
         socketRef.current.on('update', (payload?: TTap) => {
@@ -74,23 +80,7 @@ export const Round = () => {
                 })
             }
         });
-
-        socketRef.current.on('disconnect', () => {
-            console.log('Socket.io disconnected');
-            setConnectStatus(EConnect.disconnected)
-        });
-
-        return () => {
-            socketRef.current?.disconnect();
-            socketRef.current = null;
-        };
     }, [uuid, status, socketRef]);
-
-    useEffect(() => {
-        if (socketRef.current && connectStatus === EConnect.disconnected) {
-            socketRef.current.connect()
-        }
-    }, [socketRef, connectStatus])
 
     const handleClick = useCallback(() => {
         if (socketRef.current && uuid) {
@@ -156,7 +146,7 @@ export const Round = () => {
     return (
         <div className="container h-full">
             <p className="text-right">
-                Server <span className={connectStatus ? "text-green-700" : "text-red-700"}>{connectStatus ? "connected" : "disconnected"}</span>
+                Server <span className={connectStatus === EConnect.connected ? "font-bold text-green-600" : "font-bold text-red-500"}>{connectStatus === EConnect.connected ? "connected" : "disconnected"}</span>
             </p>
             <div className="h-full flex flex-col justify-center items-center gap-3">
                 {content}
