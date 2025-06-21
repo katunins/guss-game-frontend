@@ -24,11 +24,11 @@ export const Login = () => {
             return
         }
         setIsLoading(true)
-        ApiService.getUser(params).then(result => {
-            if (result?.token) {
-                AuthService.setToken(result.token)
-                const {token, ...user} = result
-                setUser(user)
+        ApiService.getUser(params).then(user => {
+            if (user?.token) {
+                AuthService.setToken(user.token)
+                const {token, ...userWithoutToken} = user
+                setUser(userWithoutToken)
                 navigate('/')
             } else {
                 setIsError(true)

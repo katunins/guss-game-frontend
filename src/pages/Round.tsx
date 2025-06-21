@@ -75,8 +75,8 @@ export const Round = () => {
                         ...prevState,
                         taps: prevState.taps.length
                             ? prevState.taps.map(tap => tap.id === payload.id ? { ...tap, count: payload.count } : tap)
-                            : [{ id: payload.id, count: payload.count, user: { username: AuthService.user?.username } }]
-                    }
+                            : [{ id: payload.id, count: payload.count, user: { username: AuthService.user?.username, isAdmin: AuthService.user?.isAdmin } }]
+                    } as TRound
                 })
             }
         });
