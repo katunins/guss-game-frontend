@@ -36,10 +36,13 @@ export const Round = () => {
         }
         ApiService.getRound(uuid).then(result => {
             if (result) {
+                if (status === ERoundStatus.finished) {
+                    socketRef.current?.disconnect()
+                }
                 setRound(convertRoundDate(result))
             }
         })
-    }, [status, uuid])
+    }, [status, uuid, socketRef])
 
     useEffect(() => {
         if (!uuid || status === ERoundStatus.finished) {
@@ -135,7 +138,7 @@ export const Round = () => {
                     </>
                 )
         }
-    }, [status, handleClick, toStart, toFinish])
+    }, [status, handleClick, toStart, toFinish, total])
 
     if (!round || !isInitialazed) {
         return (

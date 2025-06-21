@@ -2,9 +2,11 @@ import {ERoundStatus, type TRound} from "./types.ts";
 import dayjs from "dayjs";
 
 export const convertRoundDate = (round: TRound) => {
+    
     const createdAt = dayjs(round.createdAt).utc(true).local().toString()
     const startAt = dayjs(round.startAt).utc(true).local().toString()
     const finishAt = dayjs(round.finishAt).utc(true).local().toString()
+    
     return {
         ...round,
         createdAt, startAt, finishAt
